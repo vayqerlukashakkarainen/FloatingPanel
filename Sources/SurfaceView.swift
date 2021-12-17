@@ -43,6 +43,7 @@ public class SurfaceAppearance: NSObject {
             return UIColor.white
         }
     }()
+    public var background: UIView?
 
     /// The radius to use when drawing the top rounded corners.
     ///
@@ -104,6 +105,10 @@ public class SurfaceView: UIView {
     public override var backgroundColor: UIColor? {
         get { return appearance.backgroundColor }
         set { appearance.backgroundColor = newValue; setNeedsLayout() }
+    }
+    public var background: UIView? {
+        get { return appearance.background }
+        set { appearance.background = newValue; setNeedsLayout() }
     }
 
     /// The appearance settings for a surface view.
@@ -235,6 +240,11 @@ public class SurfaceView: UIView {
     private func addSubViews() {
         super.backgroundColor = .clear
         self.clipsToBounds = false
+        
+        if let bg = background {
+            bg.layer.masksToBounds = true
+            addSubview(bg)
+        }
 
         addSubview(containerView)
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -315,7 +325,12 @@ public class SurfaceView: UIView {
         super.layoutSubviews()
         log.debug("surface view frame = \(frame)")
 
-        containerView.backgroundColor = appearance.backgroundColor
+        if background == nil {
+            containerView.backgroundColor = appearance.backgroundColor
+        }
+        else {
+            containerView.backgroundColor = .clear
+        }
 
         updateCornerRadius()
         updateShadow()
